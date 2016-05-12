@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="styles/style.css">
+	<script src="https://js.pusher.com/3.0/pusher.min.js"></script>
+</head>
+<body>
+	<div id="album-details">
+		<img src="http://0.0.0.0:8080/artwork/current" class="album-artwork">
+		<div class="album-text-info">
+			<h1>Now Playing</h1>
+			<span class="info-title">Song Title</span><br />
+			<span class="info-artist">Artist Name</span>
+		</div>
+	</div>
+	<script type="text/javascript">
+	Pusher.log = function(message) {
+	if (window.console && window.console.log) {
+			window.console.log(message);
+		}
+	};
+
+	var pusher = new Pusher('***REMOVED***', {
+	  cluster: 'ap1',
+	  encrypted: true
+	});
+
+	var channel = pusher.subscribe('test_channel');
+	channel.bind('my_event', function(data) {
+	  Array.prototype.forEach.call(document.querySelectorAll('.info-title'),function(el,i){
+	  	console.log(el);
+	  	el.innerHTML = data.title;
+	  });
+	  Array.prototype.forEach.call(document.querySelectorAll('.info-artist'),function(el,i){
+	  	console.log(el);
+	  	el.innerHTML = data.artist;
+	  });
+
+  	  Array.prototype.forEach.call(document.querySelectorAll('.album-artwork'),function(el,i){
+		if(el.src.indexOf('?')>-1){
+			address = el.src.split('?')[0];
+		} else {
+			address = el.src;
+		}
+		el.src = address+"?time="+new Date().getTime();
+		});
+	});
+	</script>
+</body>
+</html>
