@@ -8,14 +8,15 @@ from pprint import pprint
 import os
 from contextlib import contextmanager
 import json
+import string
 
 import pusher
 pusher_client = pusher.Pusher(
-  app_id='190359',
-  key='***REMOVED***',
-  secret='e9a5ea2bc88d8ffedf76',
-  cluster='ap1',
-  ssl=True
+  app_id=settings.PUSHER_CONFIG['app_id'],
+  key=settings.PUSHER_CONFIG['key'],
+  secret=settings.PUSHER_CONFIG['secret'],
+  cluster=settings.PUSHER_CONFIG['cluster'],
+  ssl=settings.PUSHER_CONFIG['ssl']
 )
 
 @contextmanager
@@ -46,10 +47,20 @@ def index(request):
 def search(request, queryString):
 	if request.method == 'GET':
 		with mpdConnection() as client:
-			print queryString
-			print client.search('any',queryString)
+			results = client.search('any',queryString)
+			if len(results) == 0:
+				query = []
+				for sString in string.split(queryString):
+					query.append('any')
+					query.append(sString)
+				results = client.search(*query)
+			if len(results) > 10:
+				return HttpResponse(
+					json.dumps(results[1:11]),
+		            content_type="application/json"
+		        )
 			return HttpResponse(
-				json.dumps(client.search('any',queryString)[1:11]),
+				json.dumps(results),
 	            content_type="application/json"
 	        )
 	else:
@@ -97,12 +108,10 @@ def artwork(request):
 	if current.file:
 		file = mutagen.File(os.environ['HOME']+"/Music/"+current.file)
 		if type(file) is mutagen.mp4.MP4:
-			print file.tags
 			if file.tags.has_key('covr'):
 				return HttpResponse(file.tags['covr'][0],content_type="image/jpeg")
 
 		if type(file) is mutagen.mp3.MP3:
-			print file.tags.keys()
 			if file.tags.has_key('APIC:'):
 				return HttpResponse(file.tags['APIC:'].data,content_type=file.tags['APIC:'].mime)
 
