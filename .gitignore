@@ -1,0 +1,9 @@
+venv/*
+
+*.pyc
+
+db.sqlite3
+
+config/mpd.conf
+
+playpy/settings.py

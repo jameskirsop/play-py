@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>PlayPy</title>
+	{% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static "styles/style.css" %}">
+</head>
+<body>
+	<div id="banner">
+		<h1>PlayPy</h1>
+		<div id="banner-now-playing">
+			<div class="now-playing-text">
+				<span class="info-title">{{title}}</span> by <span class="info-artist">{{artist}}</span><br />
+				from <span class="info-album">{{album}}</span>
+			</div>
+			<img src="{% url 'music:artwork' %}" class="album-artwork">
+		</div>
+	</div>
+
+	<div class="clear-fix">
+		<h4>Add a Track</h4>
+		<form class="search">
+			{% csrf_token %}
+			<!-- <label for="search">Search</label> -->
+			<input name="search" placeholder="Search..." autocomplete="off"/>
+			<ul class="results">
+			</ul>
+		</form>
+	</div>
+
+	<div class="clear-fix">
+		<h4>Upcoming Songs</h4>
+		<ul class="upcoming-track-list">
+			{% for song in lUpcoming %}
+				<li>{{ song.title }} by {{ song.artist }}</li>
+			{% endfor %}
+		</ul>
+		<h5>There are <span class="data_total-tracks">{{ iTotalTracks }}</span> tracks currently in the queue
+	</div>
+	<script src="https://js.pusher.com/3.0/pusher.min.js"></script>
+	<script type="text/javascript" src="{% static "js/underscore.js" %}"></script>
+	<script type="text/javascript" src="{% static "js/pusher.js" %}"></script>
+	<script type="text/javascript" src="{% static "js/main.js" %}"></script>
+	<script type="text/javascript"></script>
+	<script type="text/javascript">
+	var resultTemplate = _.template('<a href="#" data-uri="<%= file %>"><em><%= title %></em> by <%= artist %><br />From <em><%= album %></em></a>');
+	var resultsContainer = document.querySelector('form.search > ul.results');
+	console.log(document.querySelector("input[name='search']"));
+		document.querySelector("input[name='search']").addEventListener('keyup',function(event){
+			if(this.value.length > 2){
+				var request = new XMLHttpRequest();
+				request.open('GET', '/search/'+this.value, true);
+				request.onload = function() {
+				  if (request.status >= 200 && request.status < 400) {
+				  	resultsContainer.innerHTML = ''
+				    var data = JSON.parse(request.responseText);
+				    for (var i = 0; i < data.length; i++) {
+				    	// console.log(data[i])
+				    	liEl = document.createElement('li');
+				    	liEl.innerHTML = resultTemplate(data[i])
+				    	resultsContainer.appendChild(liEl);
+				    }
+				    _.each(document.querySelectorAll('form.search > ul.results li'),function(el){
+				    	el.querySelector('a').addEventListener('click', function(){
+				    		ajaxReq = new XMLHttpRequest();
+				    		ajaxReq.open('POST', '/add/', true);
+				    		ajaxReq.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+				    		ajaxReq.setRequestHeader('HTTP_X_REQUESTED_WITH','XMLHttpRequest')
+							ajaxReq.setRequestHeader('Content-Type', 'application/json');
+				    		ajaxReq.onload = function(){
+				    			console.log('Sending!');
+				    		}
+				    		ajaxReq.send(JSON.stringify({'uri':this.getAttribute('data-uri')}))
+				    		document.querySelector('form.search > ul.results').innerHTML = '';
+				    	});
+				    })
+				  } else {
+
+				  }
+				};
+				request.onerror = function() {
+				  // There was a connection error of some sort
+				};
+				request.send();
+			}
+		})
+	</script>
+</body>
+</html>

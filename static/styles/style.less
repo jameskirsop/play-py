@@ -1,0 +1,155 @@
+@import url(https://fonts.googleapis.com/css?family=Lato);
+
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body{
+	background-color:#22317f;
+	color:#fff;
+	font-family: "Lato", sans-serif;
+	background-size: cover;
+}
+
+div.artwork{
+	-webkit-filter: blur(30px);
+	filter:blur(30px);
+	z-index: 0;
+	position:fixed;
+	left: 0;
+ 	right: 0;
+ 	top:0;
+ 	border:0;
+ 	margin:0;
+ 	height:100%;
+ 	content: " ";
+ 	background-size: cover;
+ 	// background-color:#ff0121
+}
+
+#album-details{
+	perspective:1000px;
+	margin:30px auto;
+	width:1024px;
+	-webkit-backdrop-filter: blur(50px);
+}
+.album-artwork{
+	height:500px;
+	// width:500px;
+	padding-top:10px;
+	transform:rotateY(20deg);
+	float:left;
+}
+
+.album-text-info{
+	float:left;
+	margin-left:30px;
+	font-size:1.5em;
+	span{line-height:1.8em;}
+}
+
+#banner{
+	h1 {display:inline;}
+
+	#banner-now-playing{
+		text-align: right;
+		float:right;
+		font-size:1.1em;
+		width:50%;
+		// line-height: 50px;
+
+		.info-title, .info-artist, .info-album{
+			font-weight:bold;
+		}
+
+		img.album-artwork{
+			max-height:70px;
+			margin-left: 10px;
+			display:inline-block;
+			float:right;
+		}
+
+		div.now-playing-text{
+			padding-top:5px;
+			display:inline-block;
+			line-height:1.4em;
+			text-align:right;
+		}
+	}	
+}
+
+#browse{
+	max-height:200px;
+	overflow:scroll;
+	& > ol.list{
+		list-style:none;
+		margin:0;
+		padding:0;
+		> li {
+			display:block;
+			line-height:2.1em;
+			float:left;
+			width:25%;
+			// margin-bottom:5px;
+			border-bottom:1px solid #2043B4;
+		}
+		.artist-name:nth-child(4n):after{
+			content: " ";
+			display:block;
+			clear:both;
+		}
+	}
+	
+}
+
+
+div.clear-fix{
+	clear:both;
+}
+
+form.search{
+	ul.results{
+	border: 1px solid #fff;
+	list-style-type: none;
+	padding-left:0;
+	visibility: hidden;
+	transition: visibility 0.2s;
+		a{
+			color:inherit;
+			text-decoration:none;
+		}
+		li{
+			border-bottom:1px solid #fff;
+			background-color: rgba(255, 255, 255, 0.15);
+			display:block;
+			line-height:1.3em;
+
+			a{
+				display:block;
+				padding:6px;
+			}
+
+			a:hover{
+				background-color: rgba(255, 255, 255, 0.3)
+			}
+		}
+	}
+
+	input{
+		border-radius:13px;
+		font-size:1em;
+		height:2em;
+		outline: none;
+		padding:0 9px 0 9px;
+		width:100%;
+
+		// &:focus{
+		// 	box-shadow: 0 0 2px rgba(85, 168, 236, 0.9);
+		// }
+		&:focus + .results{visibility: visible;}
+
+	}
+}
