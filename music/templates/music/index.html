@@ -43,7 +43,7 @@
 	<script type="text/javascript" src="{% static "js/main.js" %}"></script>
 	<script type="text/javascript"></script>
 	<script type="text/javascript">
-	var resultTemplate = _.template('<a href="#" data-uri="<%= file %>"><em><%= title %></em> by <%= artist %><br />From <em><%= album %></em></a>');
+	var resultTemplate = _.template('<a href="#" data-uri="<%= data.file %>"><em><%= data.title %></em> by <%= data.artist %><br />From <em><%= data.album %></em></a>');
 	var resultsContainer = document.querySelector('form.search > ul.results');
 	console.log(document.querySelector("input[name='search']"));
 		document.querySelector("input[name='search']").addEventListener('keyup',function(event){
@@ -55,9 +55,8 @@
 				  	resultsContainer.innerHTML = ''
 				    var data = JSON.parse(request.responseText);
 				    for (var i = 0; i < data.length; i++) {
-				    	// console.log(data[i])
 				    	liEl = document.createElement('li');
-				    	liEl.innerHTML = resultTemplate(data[i])
+				    	liEl.innerHTML = resultTemplate({data:data[i]})
 				    	resultsContainer.appendChild(liEl);
 				    }
 				    _.each(document.querySelectorAll('form.search > ul.results li'),function(el){
