@@ -20,13 +20,22 @@ channel.bind('now-playing', function(data) {
   	el.innerHTML = data.artist;
   });
 
-	  Array.prototype.forEach.call(document.querySelectorAll('.album-artwork'),function(el,i){
+  Array.prototype.forEach.call(document.querySelectorAll('.info-album'),function(el,i){
+  	console.log(el);
+  	el.innerHTML = data.album;
+  });
+
+Array.prototype.forEach.call(document.querySelectorAll('.album-artwork'),function(el,i){
 	if(el.src.indexOf('?')>-1){
 		address = el.src.split('?')[0];
 	} else {
 		address = el.src;
 	}
 	el.src = address+"?time="+new Date().getTime();
+	});
+
+Array.prototype.forEach.call(document.querySelectorAll('.album-artwork-bg'),function(el,i){
+		el.style.backgroundImage = "url('"+address+"?time="+new Date().getTime()+"')";
 	});
 });
 
@@ -36,6 +45,9 @@ channel.bind('upcoming-track-list', function(data){
 		el.innerHTML == data.iTotalTracks;
 	});
 	playlistContainer = document.querySelector('.upcoming-track-list');
+	if(playlistContainer == undefined){
+		return;
+	}
 	playlistContainer.innerHTML = '';
 	Array.prototype.forEach.call(data.tracks,function(el,i){
 		console.log(data.tracks[i]);

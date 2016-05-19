@@ -1,6 +1,7 @@
+# coding: utf-8
 from django.shortcuts import render
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
+from django.http import HttpResponse, HttpResponseRedirect, HttpRequest, HttpResponseBadRequest
 import mutagen
 from mpd import MPDClient
 from music.models import Artist,Song
@@ -74,26 +75,27 @@ def add(request):
 	if request.method == "POST":
 		with mpdConnection() as client:
 			if json.loads(request.body)['uri']:
-				client.add(json.loads(request.body)['uri'])
-				playlist = client.playlistinfo()
-				pusher_client.trigger('play-py', 'upcoming-track-list', {
-					'tracks': playlist[1:11],
-					'iTotalTracks': len(playlist) - 1
-					})
-				client.play()
-				return HttpResponse(
-					json.dumps({"result": "success"}),
-					content_type="application/json"
-				)
-			return HttpResponseBadRequest(
-				json.dumps({"result": "failure"}),
-				content_type="application/json"
-			)
-	else:
-		return HttpResponseBadRequest(
-			json.dumps({"result": "failure"}),
-			content_type="application/json"
-		)
+				try:
+					client.add(json.loads(request.body)['uri'])
+					playlist = client.playlistinfo()
+					pusher_client.trigger('play-py', 'upcoming-track-list', {
+						'tracks': playlist[1:11],
+						'iTotalTracks': len(playlist) - 1
+						})
+					client.play()
+					return HttpResponse(
+						json.dumps({"result": "success"}),
+						content_type="application/json"
+					)
+				except Exception, e:
+					return HttpResponseBadRequest(
+						json.dumps({"result": "failure"}),
+						content_type="application/json"
+					)
+	return HttpResponseBadRequest(
+		json.dumps({"result": "failure"}),
+		content_type="application/json"
+	)
 
 
 '''
