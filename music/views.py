@@ -70,6 +70,20 @@ def search(request, queryString):
             content_type="application/json"
         )
 
+def filter(request, sType, queryString):
+	print sType
+	print queryString
+	dResult = dict()
+	with mpdConnection() as client:
+		results = client.list('album',sType,queryString)
+		for result in results:
+			print client.search('album',result)
+			dResult[result] = client.search('album',result)
+	return HttpResponse(
+		json.dumps(dResult),
+		content_type="application/json"
+	)
+
 def add(request):
 	# if request.is_ajax() and request.method == "POST":
 	if request.method == "POST":

@@ -22,11 +22,22 @@
 		<h4>Add a Track</h4>
 		<form class="search">
 			{% csrf_token %}
-			<!-- <label for="search">Search</label> -->
 			<input name="search" placeholder="Search..." autocomplete="off"/>
 			<ul class="results">
 			</ul>
 		</form>
+	</div>
+
+	<div id="browse" class="clear-fix">
+		<h3>Browse</h3>
+		<div>
+			<ol>
+			{% for artist in artistList %}
+				<li><a href="#" class="artistName">{{ artist }}</a>&nbsp;</li>
+			{% endfor %}
+			</ol>
+		</div>
+
 	</div>
 
 	<div class="clear-fix">
@@ -53,6 +64,17 @@
 			<i class="fa fa-volume-up"></i>
 		</a>
 	</div>
+	<!-- <div id="browsePopup"> -->
+	<div id="browsePopup" style="display:none;">
+		<a href="#" id="browsePopupClose"><i class="fa fa-close"></i></a>
+		<h2>Artist Name</h2>
+		<div>
+			<div class="loading-cog"><i class="fa fa-spin fa-fw fa-cog"></i></div>
+			<ul>
+			</ul>
+		</div>
+		
+	</div>
 	<script src="https://js.pusher.com/3.0/pusher.min.js"></script>
 	<script type="text/javascript" src="{% static "js/underscore.js" %}"></script>
 	<script type="text/javascript" src="{% static "js/pusher.js" %}"></script>
@@ -61,8 +83,25 @@
 	<script type="text/javascript">
 	var resultTemplate = _.template('<a href="#" data-uri="<%= data.file %>"><em><%= data.title %></em> by <%= data.artist %><br />From <em><%= data.album %></em></a>');
 	var resultsContainer = document.querySelector('form.search > ul.results');
+
+	var albumTemplate = _.template('<span class="album-title"><%= title %></span><ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><%= track.title %> <i class="fa fa-plus"></i></a></li><% }); %></ol>')
 	console.log(document.querySelector("input[name='search']"));
 	var active = undefined;
+
+	function assignTrackAddLinks(el){
+		el.querySelector('a').addEventListener('click', function(){
+			ajaxReq = new XMLHttpRequest();
+			ajaxReq.open('POST', '/add/', true);
+			ajaxReq.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+			ajaxReq.setRequestHeader('HTTP_X_REQUESTED_WITH','XMLHttpRequest')
+			ajaxReq.setRequestHeader('Content-Type', 'application/json');
+			ajaxReq.onload = function(){
+				console.log('Sending!');
+			}
+			ajaxReq.send(JSON.stringify({'uri':this.getAttribute('data-uri')}))
+			document.querySelector('form.search > ul.results').innerHTML = '';
+		});
+	}
 	document.querySelector("input[name='search']").addEventListener('keyup',function(event){
 		console.log(event);
 		// console.log(event['keyIdentifier']);
@@ -88,29 +127,60 @@
 					console.log('Down!');					
 				}
 				console.log(active);
-			    _.each(document.querySelectorAll('form.search > ul.results li'),function(el){
-			    	el.querySelector('a').addEventListener('click', function(){
-			    		ajaxReq = new XMLHttpRequest();
-			    		ajaxReq.open('POST', '/add/', true);
-			    		ajaxReq.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-			    		ajaxReq.setRequestHeader('HTTP_X_REQUESTED_WITH','XMLHttpRequest')
-						ajaxReq.setRequestHeader('Content-Type', 'application/json');
-			    		ajaxReq.onload = function(){
-			    			console.log('Sending!');
-			    		}
-			    		ajaxReq.send(JSON.stringify({'uri':this.getAttribute('data-uri')}))
-			    		document.querySelector('form.search > ul.results').innerHTML = '';
-			    	});
-			    })
+			    _.each(document.querySelectorAll('form.search > ul.results li'), function(el){assignTrackAddLinks(el);});
 			  } else {
 
 			  }
 			};
-			request.onerror = function() {
-			  // There was a connection error of some sort
-			};
+			// request.onerror = function() {
+			//   // There was a connection error of some sort
+			// };
 			request.send();
 		}
+	});
+
+	_.each(document.querySelectorAll('a.artistName'),function(el){
+		elBrowsePopup = document.getElementById('browsePopup');
+		el.addEventListener('click',function(){
+			elBrowsePopup.querySelector('ul').innerHTML = '';
+			elBrowsePopup.style.display = '';
+			elBrowsePopup.querySelector('.loading-cog').classList.remove('hide');
+			console.log(this.innerHTML);
+			sBrowsedArtist = this.innerHTML;
+			ajaxReq = new XMLHttpRequest();
+			ajaxReq.open('GET','/filter/artist/'+(this.innerHTML).trim(),true);
+			ajaxReq.onload = function(e){
+				console.log(e);
+				if (ajaxReq.status >= 200 && ajaxReq.status < 400) {
+					elBrowsePopup.querySelector('h2').innerHTML = sBrowsedArtist;
+					// console.log(JSON.parse(ajaxReq.responseText).keys.length);
+					// for (var i = 0; i < JSON.parse(ajaxReq.responseText).length; i++) {
+					// 	console.log(JSON.parse(ajaxReq.responseText[i]));
+					// };
+					_.each(JSON.parse(ajaxReq.responseText),function(tracks,title){
+						console.log(title);
+						console.log(tracks);
+						// console.log(albumTemplate({tracks:tracks,title:title}));
+						liEl = document.createElement('li');
+				    	liEl.innerHTML = albumTemplate({tracks:tracks,title:title});
+				    	elBrowsePopup.querySelector('ul').appendChild(liEl);
+					});
+					_.each(elBrowsePopup.querySelectorAll('li > ol > li'), function(el){assignTrackAddLinks(el);});
+				elBrowsePopup.querySelector('.loading-cog').classList.add('hide');
+				elBrowsePopup.querySelector('.loading-cog').style.display = 'none';
+
+				} else {
+					//Display an error
+				}
+			}
+			ajaxReq.send();
+		});
+	});
+
+	document.getElementById("browsePopupClose").addEventListener('click',function(){
+		elBrowsePopup = document.getElementById('browsePopup');
+		elBrowsePopup.style.display = 'none';
+		elBrowsePopup.querySelector('.loading-cog').style.display = '';
 	});
 
 	// document.querySelector("input[name='search']").addEventListener('focusout',function(event){
