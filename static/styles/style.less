@@ -115,26 +115,30 @@ div.artwork-blur{
 }
 
 #browse{
-	max-height:200px;
-	overflow:scroll;
-	& > ol.list{
-		list-style:none;
-		margin:0;
-		padding:0;
-		> li {
-			display:block;
-			line-height:2.1em;
-			float:left;
-			width:25%;
-			// margin-bottom:5px;
-			border-bottom:1px solid #2043B4;
-		}
-		.artist-name:nth-child(4n):after{
-			content: " ";
-			display:block;
-			clear:both;
+	& > div {
+		max-height:200px;
+		overflow-x:hidden;
+		overflow-y:scroll;
+		& > ol{
+			list-style:none;
+			margin:0;
+			padding:0;
+			> li {
+				display:block;
+				line-height:2.1em;
+				float:left;
+				width:25%;
+				// margin-bottom:5px;
+				border-bottom:1px solid #2043B4;
+			}
+			.artist-name:nth-child(4n):after{
+				content: " ";
+				display:block;
+				clear:both;
+			}
 		}
 	}
+	
 	
 }
 
@@ -195,6 +199,68 @@ form.search{
 	padding:10px;
 	text-align: center;
 	width:100%;
-	position:absolute;
+	position:fixed;
 	bottom:0;
+}
+
+#browsePopup{
+	border-radius: 5px;
+	background-color: lighten(@daracoBlue, 20%);
+	width:500px;
+	margin-left:-250px;
+	left:50%;
+	top:25%;
+	padding:10px;
+	position:fixed;
+	z-index:10;
+
+	h2{
+		text-align: center;
+	}
+
+
+	
+	.album-title{
+		font-size:1.1em;
+	}
+
+	> a:first-child{
+		position:absolute;
+		right:10px;
+		top:10px;
+	}
+
+	> div{
+		min-height:300px;
+		max-height:400px;
+		overflow-y:scroll;
+		
+		> div{
+			transition: opacity 400ms;
+			text-align: center;			
+			.fa-cog{
+				font-size:5em;
+			}
+			// &.show{opacity:1;}
+			&.hide{opacity:0;}
+		}	
+		a:hover{
+			color:#C3C7EE;
+		}
+
+		i.fa-plus{
+			float:right;
+			margin-right:15px;
+		}
+
+		> ul {
+			list-style:none;
+			margin:0;
+			padding:0;
+			> li{
+				margin-bottom:10px;
+			}
+		}
+		
+	}
 }
