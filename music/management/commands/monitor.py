@@ -33,5 +33,5 @@ while True:
 		playlist = client.playlistinfo()
 		pusher_client.trigger('play-py', 'upcoming-track-list', {
 			'tracks': playlist[1:11],
-			'iTotalTracks': len(playlist)
+			'iTotalTracks': len(playlist) - 1
 			})

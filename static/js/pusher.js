@@ -42,7 +42,7 @@ Array.prototype.forEach.call(document.querySelectorAll('.album-artwork-bg'),func
 var trackListTemplate = _.template('<%= title %> by <%= artist %>')
 channel.bind('upcoming-track-list', function(data){
 	Array.prototype.forEach.call(document.querySelectorAll('.data_total-tracks'),function(el,i){
-		el.innerHTML == data.iTotalTracks;
+		el.innerHTML = data.iTotalTracks;
 	});
 	playlistContainer = document.querySelector('.upcoming-track-list');
 	if(playlistContainer == undefined){
