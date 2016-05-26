@@ -10,6 +10,8 @@ import os
 from contextlib import contextmanager
 import json
 import string
+import urllib2
+import HTMLParser
 
 import pusher
 pusher_client = pusher.Pusher(
@@ -72,10 +74,11 @@ def search(request, queryString):
 
 def filter(request, sType, queryString):
 	print sType
-	print queryString
+	html_parser = HTMLParser.HTMLParser()
+	print html_parser.unescape(urllib2.unquote(queryString))
 	dResult = dict()
 	with mpdConnection() as client:
-		results = client.list('album',sType,queryString)
+		results = client.list('album',sType,html_parser.unescape(urllib2.unquote(queryString)))
 		for result in results:
 			print client.search('album',result)
 			dResult[result] = client.search('album',result)
@@ -130,6 +133,23 @@ def artwork(request):
 		if type(file) is mutagen.mp3.MP3:
 			if file.tags.has_key('APIC:'):
 				return HttpResponse(file.tags['APIC:'].data,content_type=file.tags['APIC:'].mime)
+
+	with open(os.path.join(settings.BASE_DIR, "static/no-artwork.png"), "rb") as f:
+		return HttpResponse(f.read(), content_type="image/jpeg")
+
+def artwork_find(request,albumName):
+	if request.method == "GET":
+		with mpdConnection() as client:
+			html_parser = HTMLParser.HTMLParser()
+			result = client.search('album',albumName)
+			file = mutagen.File(os.environ['HOME']+"/Music/"+result[0]['file'])
+			if type(file) is mutagen.mp4.MP4:
+				if file.tags.has_key('covr'):
+					return HttpResponse(file.tags['covr'][0],content_type="image/jpeg")
+
+			if type(file) is mutagen.mp3.MP3:
+				if file.tags.has_key('APIC:'):
+					return HttpResponse(file.tags['APIC:'].data,content_type=file.tags['APIC:'].mime)
 
 	with open(os.path.join(settings.BASE_DIR, "static/no-artwork.png"), "rb") as f:
 		return HttpResponse(f.read(), content_type="image/jpeg")
