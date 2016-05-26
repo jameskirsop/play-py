@@ -7,48 +7,58 @@
 	<link rel="stylesheet" type="text/css" href="{% static "styles/font-awesome/css/font-awesome.min.css" %}">
 </head>
 <body>
-	<div id="banner">
-		<h1>PlayPy</h1>
-		<div id="banner-now-playing">
-			<div class="now-playing-text">
-				<span class="info-title">{{title}}</span> by <span class="info-artist">{{artist}}</span><br />
-				from <span class="info-album">{{album}}</span>
+	<div id="main">
+		<div id="banner">
+			<h1>PlayPy</h1>
+			<div id="banner-now-playing">
+				<div class="now-playing-text">
+					<span class="info-title">{{title}}</span> by <span class="info-artist">{{artist}}</span><br />
+					from <span class="info-album">{{album}}</span>
+				</div>
+				<img src="{% url 'music:artwork' %}" class="album-artwork">
 			</div>
-			<img src="{% url 'music:artwork' %}" class="album-artwork">
-		</div>
-	</div>
-
-	<div class="clear-fix">
-		<h4>Add a Track</h4>
-		<form class="search">
-			{% csrf_token %}
-			<input name="search" placeholder="Search..." autocomplete="off"/>
-			<ul class="results">
-			</ul>
-		</form>
-	</div>
-
-	<div id="browse" class="clear-fix">
-		<h3>Browse</h3>
-		<div>
-			<ol>
-			{% for artist in artistList %}
-				<li><a href="#" class="artistName">{{ artist }}</a>&nbsp;</li>
-			{% endfor %}
-			</ol>
 		</div>
 
-	</div>
+		<div id="middleContainer">
+			<div id="col_searchAndBrowse">
+				<div id="searchContainer">
+					<h2>Add a Track</h2>
+					<form class="search">
+						{% csrf_token %}
+						<input name="search" placeholder="Search..." autocomplete="off"/>
+						<ul class="results">
+						</ul>
+					</form>
+				</div>
 
-	<div class="clear-fix">
-		<h4>Upcoming Songs</h4>
-		<ul class="upcoming-track-list">
-			{% for song in lUpcoming %}
-				<li>{{ song.title }} by {{ song.artist }}</li>
-			{% endfor %}
-		</ul>
-		<h5>There are <span class="data_total-tracks">{{ iTotalTracks }}</span> tracks currently in the queue
+				<div id="browse">
+				<div>
+					<h3>Browse</h3>
+					<a href="">Artist</a> | 
+					<a href="">Album</a>
+				</div>
+					<div>
+						<ol>
+						{% for artist in artistList %}
+							<li><a href="#" class="artistName">{{ artist }}</a>&nbsp;</li>
+						{% endfor %}
+						</ol>
+					</div>
+				</div>
+			</div>
+
+			<div id="upcoming-tracks">
+				<h2>Upcoming Songs</h2>
+				<ul class="upcoming-track-list">
+					{% for song in lUpcoming %}
+						<li>{{ song.title }} by {{ song.artist }}</li>
+					{% endfor %}
+				</ul>
+				<h5>There are <span class="data_total-tracks">{{ iTotalTracks }}</span> tracks currently in the queue
+			</div>
+		</div>
 	</div>
+	
 	<div id="playback">
 		<audio id="stream" preload="none">
 			<source src="http://yodelbox.ad.daraco.net.au:8000" type='audio/mpeg; codecs="mp3"'>
@@ -71,6 +81,11 @@
 		<div>
 			<div class="loading-cog"><i class="fa fa-spin fa-fw fa-cog"></i></div>
 			<ul>
+<!-- 			<li>
+				<span class="album-title"><%= title %></span><br />
+				<img src="{% url 'music:artwork' %}" class="album-artwork">
+<ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><%= track.title %> <i class="fa fa-plus"></i></a></li><% }); %></ol>
+			</li> -->
 			</ul>
 		</div>
 		
@@ -84,7 +99,7 @@
 	var resultTemplate = _.template('<a href="#" data-uri="<%= data.file %>"><em><%= data.title %></em> by <%= data.artist %><br />From <em><%= data.album %></em></a>');
 	var resultsContainer = document.querySelector('form.search > ul.results');
 
-	var albumTemplate = _.template('<span class="album-title"><%= title %></span><ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><%= track.title %> <i class="fa fa-plus"></i></a></li><% }); %></ol>')
+	var albumTemplate = _.template('<span class="album-title"><%= title %></span><br /><img src="/artwork/album/<%= encodeURIComponent(title) %>" class="album-artwork"><ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><%= track.title %> <i class="fa fa-plus"></i></a></li><% }); %></ol>')
 	console.log(document.querySelector("input[name='search']"));
 	var active = undefined;
 
@@ -103,8 +118,6 @@
 		});
 	}
 	document.querySelector("input[name='search']").addEventListener('keyup',function(event){
-		console.log(event);
-		// console.log(event['keyIdentifier']);
 		if(this.value.length > 1){
 			var request = new XMLHttpRequest();
 			request.open('GET', '/search/'+this.value, true);
@@ -124,7 +137,6 @@
 			    	} else {
 			    		active = active.nextSibling
 			    	}
-					console.log('Down!');					
 				}
 				console.log(active);
 			    _.each(document.querySelectorAll('form.search > ul.results li'), function(el){assignTrackAddLinks(el);});
@@ -148,19 +160,14 @@
 			console.log(this.innerHTML);
 			sBrowsedArtist = this.innerHTML;
 			ajaxReq = new XMLHttpRequest();
-			ajaxReq.open('GET','/filter/artist/'+(this.innerHTML).trim(),true);
+			ajaxReq.open('GET','/filter/artist/'+encodeURIComponent((this.innerHTML).trim()),true);
 			ajaxReq.onload = function(e){
 				console.log(e);
 				if (ajaxReq.status >= 200 && ajaxReq.status < 400) {
 					elBrowsePopup.querySelector('h2').innerHTML = sBrowsedArtist;
-					// console.log(JSON.parse(ajaxReq.responseText).keys.length);
-					// for (var i = 0; i < JSON.parse(ajaxReq.responseText).length; i++) {
-					// 	console.log(JSON.parse(ajaxReq.responseText[i]));
-					// };
 					_.each(JSON.parse(ajaxReq.responseText),function(tracks,title){
 						console.log(title);
 						console.log(tracks);
-						// console.log(albumTemplate({tracks:tracks,title:title}));
 						liEl = document.createElement('li');
 				    	liEl.innerHTML = albumTemplate({tracks:tracks,title:title});
 				    	elBrowsePopup.querySelector('ul').appendChild(liEl);
@@ -168,7 +175,6 @@
 					_.each(elBrowsePopup.querySelectorAll('li > ol > li'), function(el){assignTrackAddLinks(el);});
 				elBrowsePopup.querySelector('.loading-cog').classList.add('hide');
 				elBrowsePopup.querySelector('.loading-cog').style.display = 'none';
-
 				} else {
 					//Display an error
 				}
@@ -182,10 +188,6 @@
 		elBrowsePopup.style.display = 'none';
 		elBrowsePopup.querySelector('.loading-cog').style.display = '';
 	});
-
-	// document.querySelector("input[name='search']").addEventListener('focusout',function(event){
-	// 	resultsContainer.innerHTML = '';
-	// },true);
 
 	sStreamStatus = 'stop'
 	oStreamElement = document.getElementById('stream');
