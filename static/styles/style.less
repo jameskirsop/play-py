@@ -152,6 +152,7 @@ div.artwork-blur{
 	flex-direction:row;
 	// align-items:stretch;
 	height:100%;
+	margin-bottom:60px;
 }
 
 #col_searchAndBrowse{
@@ -167,7 +168,7 @@ div.artwork-blur{
 	min-height:110px;
 	flex-grow:1;
 	order:0;
-	// overflow:visible;
+	overflow:visible;
 	// flex-basis:auto;
 }
 
@@ -188,38 +189,80 @@ div.artwork-blur{
 		h3{display:inline-block;}
 	}
 
-	& > div:nth-child(2) {
+	& > div:not(:nth-child(1)) {
 		overflow-y:scroll;
-		min-height:10px;
+		min-height:200px;
 		flex-grow:1;
-		& > ol{
-			list-style:none;
-			margin:0;
-			padding:0;
-			> li {
-				display:block;
-				line-height:2.2em;
-				float:left;
-				width:33.33333%;
-				// margin-bottom:5px;
-				border-bottom:1px solid @daracoBlue;
-			}
-			.artist-name:nth-child(3n):after{
-				content: " ";
-				display:block;
-				clear:both;
-			}
-		}
 	}
-	
-	
 }
 
+#browsing_artist{
+			ol{
+				list-style:none;
+				margin:0;
+				padding:0;
+				> li {
+					display:block;
+					line-height:2.2em;
+					float:left;
+					width:33.33333%;
+					// margin-bottom:5px;
+					border-bottom:1px solid @daracoBlue;
+				}
+				.artist-name:nth-child(3n):after{
+					content: " ";
+					display:block;
+					clear:both;
+				}
+			}	
+		}
+		
+#browsing_album{
+	// display:none;
+	ol{
+		display:flex;
+		flex-flow: row wrap;
+		justify-content: space-around;
+		// align-content:flex-start;
+		list-style:none;
+		margin:0;
+		padding:0;
 
-// div.clear-fix{
-// 	clear:both;
-// }
+		&:after{
+			content: "";
+			flex: auto;
+		}
 
+		li{
+			padding: 15px 5px;
+			// display:block;
+			text-align: center;
+			// margin:8px;
+			// float:left;
+			// width:20%;
+			// width:16.66666%;
+			min-width:100px;
+			max-width:190px;
+			img{
+				width:80%;
+			}
+			// @media(max-width:600px){
+			// 	width:33.3333%;
+			// }
+
+			// @media(max-width:800px){
+			// 	width:25%;
+			// }
+			// 	margin: 0 8px;
+			// 	&:nth-child(3n):after{
+			// 		content: " ";
+			// 		display:block;
+			// 		clear:both;
+			// 	}
+			// }
+		}
+	}
+}
 
 form.search{
 	ul.results{
