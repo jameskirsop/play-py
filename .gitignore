@@ -7,3 +7,4 @@ db.sqlite3
 config/mpd.conf
 
 playpy/settings.py
+.DS_Store
