@@ -12,8 +12,9 @@ import json
 import string
 import urllib2
 import HTMLParser
-
 import pusher
+from pprint import pprint
+
 pusher_client = pusher.Pusher(
   app_id=settings.PUSHER_CONFIG['app_id'],
   key=settings.PUSHER_CONFIG['key'],
@@ -47,6 +48,22 @@ def index(request):
 			'artistList':artistList
 		})
 
+def list(request, queryString,start,end):
+	if request.method == 'GET':
+		lReturn = []
+		with mpdConnection() as client:
+			if queryString == 'albums':
+				for artist in client.list('artist')[int(start):int(end)]:
+					for album in client.list('album','artist',artist):
+						# print album
+						# print '=='+artist
+						lReturn.append({'artist':artist,'album':album})
+					# pass
+			return HttpResponse(
+				json.dumps(lReturn),
+				content_type="application/json"
+				)	
+
 def search(request, queryString):
 	if request.method == 'GET':
 		with mpdConnection() as client:
@@ -73,15 +90,30 @@ def search(request, queryString):
         )
 
 def filter(request, sType, queryString):
-	print sType
 	html_parser = HTMLParser.HTMLParser()
-	print html_parser.unescape(urllib2.unquote(queryString))
+	# print html_parser.unescape(urllib2.unquote(queryString))
 	dResult = dict()
 	with mpdConnection() as client:
 		results = client.list('album',sType,html_parser.unescape(urllib2.unquote(queryString)))
 		for result in results:
-			print client.search('album',result)
+			# print client.search('album',result)
 			dResult[result] = client.search('album',result)
+	return HttpResponse(
+		json.dumps(dResult),
+		content_type="application/json"
+	)
+
+
+def get_album(request, artistName, albumName):
+	html_parser = HTMLParser.HTMLParser()
+	dResult = []
+	with mpdConnection() as client:
+		results = client.find('artist',html_parser.unescape(urllib2.unquote(artistName)))
+		for result in results:
+			print result
+			if 'album' in result and result['album'] == albumName:
+				dResult.append(result)
+		pprint(results)
 	return HttpResponse(
 		json.dumps(dResult),
 		content_type="application/json"

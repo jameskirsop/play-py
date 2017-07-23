@@ -32,12 +32,16 @@
 				</div>
 
 				<div id="browse">
-				<div>
-					<h3>Browse</h3>
-					<a href="">Artist</a> | 
-					<a href="">Album</a>
-				</div>
 					<div>
+						<h3>Browse</h3>
+						<a href="#" id="browseBy_artist">Artist</a> | 
+						<a href="#" id="browseBy_album">Album</a>
+					</div>
+					<div id="browsing_album" style="display:none;">
+						<ol>
+						</ol>
+					</div>
+ 					<div id="browsing_artist">
 						<ol>
 						{% for artist in artistList %}
 							<li><a href="#" class="artistName">{{ artist }}</a>&nbsp;</li>
@@ -99,7 +103,9 @@
 	var resultTemplate = _.template('<a href="#" data-uri="<%= data.file %>"><em><%= data.title %></em> by <%= data.artist %><br />From <em><%= data.album %></em></a>');
 	var resultsContainer = document.querySelector('form.search > ul.results');
 
-	var albumTemplate = _.template('<span class="album-title"><%= title %></span><br /><img src="/artwork/album/<%= encodeURIComponent(title) %>" class="album-artwork"><ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><%= track.title %> <i class="fa fa-plus"></i></a></li><% }); %></ol>')
+	var albumTemplate = _.template('<span class="album-title"><%= title %></span><br /><img src="/artwork/album/<%= encodeURIComponent(title) %>" class="album-artwork"><ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><%= track.title %> <i class="fa fa-plus"></i></a></li><% }); %></ol>');
+
+	var artworkTemplate = _.template('<a href="#" class="grabAlbum" data-artist="<%= artist %>" data-album="<%= album %>"><img src="/artwork/album/<%= encodeURIComponent(album) %>"><p><%= album %><br /><%= artist %></p></a>')
 	console.log(document.querySelector("input[name='search']"));
 	var active = undefined;
 
@@ -138,7 +144,6 @@
 			    		active = active.nextSibling
 			    	}
 				}
-				console.log(active);
 			    _.each(document.querySelectorAll('form.search > ul.results li'), function(el){assignTrackAddLinks(el);});
 			  } else {
 
@@ -162,7 +167,6 @@
 			ajaxReq = new XMLHttpRequest();
 			ajaxReq.open('GET','/filter/artist/'+encodeURIComponent((this.innerHTML).trim()),true);
 			ajaxReq.onload = function(e){
-				console.log(e);
 				if (ajaxReq.status >= 200 && ajaxReq.status < 400) {
 					elBrowsePopup.querySelector('h2').innerHTML = sBrowsedArtist;
 					_.each(JSON.parse(ajaxReq.responseText),function(tracks,title){
@@ -226,6 +230,99 @@
 	document.getElementById('playback-vol-up').addEventListener("click", function(){
 		oStreamElement.volume+=0.1
 	});
+
+	var iAlbumStart = 0;
+	var bAlbumComplete = false;
+	var xhrAlbumRequest = new XMLHttpRequest;
+	var bAlbumProcessing = false;
+
+
+	function loadAlbumArt(){
+		xhrAlbumRequest.open("GET","http://127.0.0.1:8081/list/albums/"+iAlbumStart+"/"+parseInt(iAlbumStart+19));
+		xhrAlbumRequest.onload = function(e){
+			if (xhrAlbumRequest.status >= 200 && xhrAlbumRequest.status < 400) {
+				resultsList = document.querySelector('#browsing_album > ol');
+				_.each(JSON.parse(xhrAlbumRequest.responseText),function(album){
+					liEl = document.createElement('li');
+			    	liEl.innerHTML = artworkTemplate(album)
+			    	link = liEl.querySelector('a.grabAlbum')
+			    	link.addEventListener('click',function(event){
+			    		elCurrent = this;
+			    		// console.log(this)
+						var xhrAlbumListRequest = new XMLHttpRequest;
+						xhrAlbumListRequest.open("GET","http://127.0.0.1:8081/filter/artist/"+encodeURIComponent(this.dataset.artist)+"/album/"+encodeURIComponent(this.dataset.album));
+						xhrAlbumListRequest.onload = function(e){
+							if (xhrAlbumListRequest.status >= 200 && xhrAlbumListRequest.status < 400) {
+								elBrowsePopup.querySelector('ul').innerHTML = '';
+								elBrowsePopup.style.display = '';
+								elBrowsePopup.querySelector('.loading-cog').classList.remove('hide');
+								elBrowsePopup.querySelector('h2').innerHTML = elCurrent.dataset.artist;
+								console.log('RETURN')
+								console.log(JSON.parse(xhrAlbumListRequest.responseText));
+								console.log(elCurrent.dataset.album);
+								elTrackLi = document.createElement('li');
+						    	elTrackLi.innerHTML = albumTemplate({tracks:JSON.parse(xhrAlbumListRequest.responseText),title:elCurrent.dataset.album});
+						    	elBrowsePopup.querySelector('ul').appendChild(elTrackLi);
+								_.each(elBrowsePopup.querySelectorAll('li > ol > li'), function(el){assignTrackAddLinks(el);});
+									elBrowsePopup.querySelector('.loading-cog').classList.add('hide');
+									elBrowsePopup.querySelector('.loading-cog').style.display = 'none';
+								}
+							};
+						xhrAlbumListRequest.send();
+					});
+			    	resultsList.appendChild(liEl);
+				});
+				iAlbumStart += 20;
+				bAlbumProcessing = false;
+
+				// updateAlbumArtBounds();
+			}
+		}
+		xhrAlbumRequest.send();
+
+		// grabAlbum
+		// _.each(document.querySelectorAll('a.grabAlbum'),function(el){
+		// 	el.addEventListener(
+		// 	});
+		// });
+	};
+
+	loadAlbumArt();
+	// function updateAlbumArt(){
+	// 	document.querySelector('#browsing_album > ol:')
+	// }
+	function updateAlbumArtBounds(){
+		document.querySelector('#browsing_album').addEventListener('scroll',function(){
+			console.log('Scroll');
+			elLastChild = this.querySelector('ol').lastChild;
+			// console.log(elLastChild.getBoundingClientRect());
+			// console.log(this.offsetHeight);
+			// console.log(elLastChild);
+			console.log(elLastChild.getBoundingClientRect().top)
+			console.log(this.offsetHeight + elLastChild.getBoundingClientRect().height*1.1)
+			console.log(xhrAlbumRequest.readyState)
+			console.log(bAlbumProcessing)
+			if (elLastChild.getBoundingClientRect().top < (this.offsetHeight + elLastChild.getBoundingClientRect().height*1.1) && xhrAlbumRequest.readyState == 4) {
+				if(!bAlbumProcessing){
+					loadAlbumArt();
+				}
+				bAlbumProcessing = true;
+			}
+		});		
+	}
+
+	updateAlbumArtBounds();
+
+	_.each(document.querySelectorAll('#browseBy_artist, #browseBy_album'), function(el){
+		console.log(el)
+		el.addEventListener('click',function(){
+			albumdiv = document.querySelector('#browsing_album');
+			albumdiv.style.display = (albumdiv.style.display == 'flex' ? 'none' : 'flex');
+			artistdiv = document.querySelector('#browsing_artist');
+			artistdiv.style.display = (artistdiv.style.display == ('block' | 'flex' | '') ? 'none' : '');
+		})
+	});
+
 	</script>
 </body>
 </html>

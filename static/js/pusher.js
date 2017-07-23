@@ -4,7 +4,7 @@ if (window.console && window.console.log) {
 	}
 };
 
-var pusher = new Pusher('***REMOVED***', {
+var pusher = new Pusher('18e076434d0479a10e71', {
   cluster: 'ap1',
   encrypted: true
 });
