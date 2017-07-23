@@ -31,7 +31,17 @@ while True:
 			'file': cursong.file if hasattr(cursong,'file') else ''
 			})
 		playlist = client.playlistinfo()
-		pusher_client.trigger('play-py', 'upcoming-track-list', {
-			'tracks': playlist[1:11],
-			'iTotalTracks': len(playlist) - 1
-			})
+		backoff = 2
+		delay = 2
+		for n in range(5):
+			try:
+				pusher_client.trigger('play-py', 'upcoming-track-list', {
+					'tracks': playlist[1:11],
+					'iTotalTracks': len(playlist) - 1
+					})
+			except Exception as e:
+				time.sleep(delay)
+				delay *= backoff
+				if n < 5:
+					continue
+				raise e		
