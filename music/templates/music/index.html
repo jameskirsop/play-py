@@ -238,7 +238,7 @@
 
 
 	function loadAlbumArt(){
-		xhrAlbumRequest.open("GET","http://127.0.0.1:8081/list/albums/"+iAlbumStart+"/"+parseInt(iAlbumStart+19));
+		xhrAlbumRequest.open("GET","/list/albums/"+iAlbumStart+"/"+parseInt(iAlbumStart+19));
 		xhrAlbumRequest.onload = function(e){
 			if (xhrAlbumRequest.status >= 200 && xhrAlbumRequest.status < 400) {
 				resultsList = document.querySelector('#browsing_album > ol');
@@ -250,7 +250,7 @@
 			    		elCurrent = this;
 			    		// console.log(this)
 						var xhrAlbumListRequest = new XMLHttpRequest;
-						xhrAlbumListRequest.open("GET","http://127.0.0.1:8081/filter/artist/"+encodeURIComponent(this.dataset.artist)+"/album/"+encodeURIComponent(this.dataset.album));
+						xhrAlbumListRequest.open("GET","/filter/artist/"+encodeURIComponent(this.dataset.artist)+"/album/"+encodeURIComponent(this.dataset.album));
 						xhrAlbumListRequest.onload = function(e){
 							if (xhrAlbumListRequest.status >= 200 && xhrAlbumListRequest.status < 400) {
 								elBrowsePopup.querySelector('ul').innerHTML = '';

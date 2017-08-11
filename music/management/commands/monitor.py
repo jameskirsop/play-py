@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from mpd import MPDClient
 from music.models import Artist,Song
+import time
 
 import pusher
 pusher_client = pusher.Pusher(
