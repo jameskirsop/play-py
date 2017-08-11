@@ -4,7 +4,7 @@ if (window.console && window.console.log) {
 	}
 };
 
-var pusher = new Pusher('***REMOVED***', {
+var pusher = new Pusher('<SUPERSECRETKEY>', {
   cluster: 'ap1',
   encrypted: true
 });

@@ -1,12 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
 from mpd import MPDClient
 from music.models import Artist,Song
+import time
 
 import pusher
 pusher_client = pusher.Pusher(
   app_id='190359',
-  key='***REMOVED***',
-  secret='***REMOVED***',
+  key='18e076434d0479a10e71',
+  secret='e9a5ea2bc88d8ffedf76',
   cluster='ap1',
   ssl=True
 )
