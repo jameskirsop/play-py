@@ -65,7 +65,7 @@
 	
 	<div id="playback">
 		<audio id="stream" preload="none">
-			<source src="http://yodelbox.ad.daraco.net.au:8000" type='audio/mpeg; codecs="mp3"'>
+			<source src="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.get_host }}/stream" type='audio/mpeg; codecs="mp3"'>
 			Your browser doesn't support the HTML5 Audio Tag.
 		</audio>
 		<a href="#" id="playback-control">

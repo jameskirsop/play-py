@@ -7,7 +7,7 @@
 </head>
 <body>
 	<div id="album-details">
-		<img src="http://0.0.0.0:8080/artwork/current" class="album-artwork">
+		<img src="{% if request.is_secure %}https://{% else %}http://{% endif %}{{ request.get_host }}/artwork/current" class="album-artwork">
 		<div class="album-text-info">
 			<h1>Now Playing</h1>
 			<span class="info-title">Song Title</span><br />
