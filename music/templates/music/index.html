@@ -37,11 +37,11 @@
 						<a href="#" id="browseBy_artist">Artist</a> | 
 						<a href="#" id="browseBy_album">Album</a>
 					</div>
-					<div id="browsing_album" style="display:none;">
+					<div id="browsing_album" style="display:flex;">
 						<ol>
 						</ol>
 					</div>
- 					<div id="browsing_artist">
+ 					<div id="browsing_artist" style="display:none;">
 						<ol>
 						{% for artist in artistList %}
 							<li><a href="#" class="artistName">{{ artist }}</a>&nbsp;</li>
@@ -319,7 +319,8 @@
 			albumdiv = document.querySelector('#browsing_album');
 			albumdiv.style.display = (albumdiv.style.display == 'flex' ? 'none' : 'flex');
 			artistdiv = document.querySelector('#browsing_artist');
-			artistdiv.style.display = (artistdiv.style.display == ('block' | 'flex' | '') ? 'none' : '');
+			console.log(artistdiv.style.display)
+			artistdiv.style.display = (artistdiv.style.display == 'flex' ? 'none' : 'flex');
 		})
 	});
 
