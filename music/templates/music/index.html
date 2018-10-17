@@ -94,7 +94,7 @@
 		</div>
 		
 	</div>
-	<script src="https://js.pusher.com/3.0/pusher.min.js"></script>
+	<script src="https://js.pusher.com/4.2/pusher.min.js"></script>
 	<script type="text/javascript" src="{% static "js/underscore.js" %}"></script>
 	<script type="text/javascript" src="{% static "js/pusher.js" %}"></script>
 	<script type="text/javascript" src="{% static "js/main.js" %}"></script>
@@ -105,7 +105,7 @@
 
 	var albumTemplate = _.template('<span class="album-title"><%= title %></span><br /><img src="/artwork/album/<%= encodeURIComponent(title) %>" class="album-artwork"><ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><%= track.title %> <i class="fa fa-plus"></i></a></li><% }); %></ol>');
 
-	var artworkTemplate = _.template('<a href="#" class="grabAlbum" data-artist="<%= artist %>" data-album="<%= album %>"><img src="/artwork/album/<%= encodeURIComponent(album) %>"><p><%= album %><br /><%= artist %></p></a>')
+	var artworkTemplate = _.template('<a href="#" class="grabAlbum" data-artist="<%= artist %>" data-album="<%= album %>"><div class="browse_artwork_container"><img src="/artwork/album/<%= encodeURIComponent(album) %>"></div><span><%= album %></span><span class="artist_name"><%= artist %></span></a>')
 	console.log(document.querySelector("input[name='search']"));
 	var active = undefined;
 
@@ -321,6 +321,22 @@
 			artistdiv = document.querySelector('#browsing_artist');
 			artistdiv.style.display = (artistdiv.style.display == ('block' | 'flex' | '') ? 'none' : '');
 		})
+	});
+
+	currentBuffer = 0
+
+	playpause = document.getElementById('playback-control')
+	
+	playpause.addEventListener('click', function(el){
+		console.log('Click Play');
+		click_timestamp = performance.now()
+	});
+
+	stream = document.getElementById('stream');
+	stream.addEventListener('playing',function(){
+		console.log('Actually playing');
+		currentBuffer = performance.now() - click_timestamp;
+		console.log(currentBuffer);
 	});
 
 	</script>
