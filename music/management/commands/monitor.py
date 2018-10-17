@@ -12,7 +12,7 @@ pusher_client = pusher.Pusher(
   ssl=True
 )
 
-print 'Starting Monitor'
+print('Starting Monitor')
 
 client = MPDClient()
 client.connect("localhost",6600)
@@ -34,7 +34,8 @@ while True:
 		playlist = client.playlistinfo()
 		backoff = 2
 		delay = 2
-		for n in range(5):
+		n = 0
+		while True:
 			try:
 				pusher_client.trigger('play-py', 'upcoming-track-list', {
 					'tracks': playlist[1:11],
@@ -43,6 +44,8 @@ while True:
 			except Exception as e:
 				time.sleep(delay)
 				delay *= backoff
-				if n < 5:
+				if n < 20:
 					continue
-				raise e		
+				delay = 2
+				n = 0
+				# raise e		

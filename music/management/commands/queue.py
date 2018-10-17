@@ -10,8 +10,8 @@ while True:
 	client.idle()
 	if len(client.playlistinfo()) <= 1:
 		# add new song
-		print 'oh no!'
-		print client.stats()
+		print('oh no!')
+		print(client.stats())
 
 		songChoice = random.choice(client.listallinfo())
 		while not 'file' in songChoice:

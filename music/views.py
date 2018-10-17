@@ -10,8 +10,8 @@ import os
 from contextlib import contextmanager
 import json
 import string
-import urllib2
-import HTMLParser
+import urllib
+import html
 import pusher
 from pprint import pprint
 
@@ -53,7 +53,7 @@ def list(request, queryString,start,end):
 		lReturn = []
 		with mpdConnection() as client:
 			if queryString == 'albums':
-				for artist in client.list('artist')[int(start):int(end)]:
+				for artist in client.list('albumartist')[int(start):int(end)]:
 					for album in client.list('album','artist',artist):
 						# print album
 						# print '=='+artist
@@ -70,7 +70,7 @@ def search(request, queryString):
 			results = client.search('any',queryString)
 			if len(results) == 0:
 				query = []
-				for sString in string.split(queryString):
+				for sString in queryString.split:
 					query.append('any')
 					query.append(sString)
 				results = client.search(*query)
@@ -90,11 +90,11 @@ def search(request, queryString):
         )
 
 def filter(request, sType, queryString):
-	html_parser = HTMLParser.HTMLParser()
-	# print html_parser.unescape(urllib2.unquote(queryString))
+	html_parser = html.parser.HTMLParser()
+	# print html_parser.unescape(urllib.parse.unquote(queryString))
 	dResult = dict()
 	with mpdConnection() as client:
-		results = client.list('album',sType,html_parser.unescape(urllib2.unquote(queryString)))
+		results = client.list('album',sType,html_parser.unescape(urllib.parse.unquote(queryString)))
 		for result in results:
 			# print client.search('album',result)
 			dResult[result] = client.search('album',result)
@@ -105,12 +105,11 @@ def filter(request, sType, queryString):
 
 
 def get_album(request, artistName, albumName):
-	html_parser = HTMLParser.HTMLParser()
+	html_parser = html.parser.HTMLParser()
 	dResult = []
 	with mpdConnection() as client:
-		results = client.find('artist',html_parser.unescape(urllib2.unquote(artistName)))
+		results = client.find('artist',html_parser.unescape(urllib.parse.unquote(artistName)))
 		for result in results:
-			print result
 			if 'album' in result and result['album'] == albumName:
 				dResult.append(result)
 		pprint(results)
@@ -136,7 +135,7 @@ def add(request):
 						json.dumps({"result": "success"}),
 						content_type="application/json"
 					)
-				except Exception, e:
+				except Exception:
 					return HttpResponseBadRequest(
 						json.dumps({"result": "failure"}),
 						content_type="application/json"
@@ -159,11 +158,11 @@ def artwork(request):
 	if current.file:
 		file = mutagen.File(os.environ['HOME']+"/Music/"+current.file)
 		if type(file) is mutagen.mp4.MP4:
-			if file.tags.has_key('covr'):
+			if 'covr' in file.tags:
 				return HttpResponse(file.tags['covr'][0],content_type="image/jpeg")
 
 		if type(file) is mutagen.mp3.MP3:
-			if file.tags.has_key('APIC:'):
+			if 'APIC:' in file.tags:
 				return HttpResponse(file.tags['APIC:'].data,content_type=file.tags['APIC:'].mime)
 
 	with open(os.path.join(settings.BASE_DIR, "static/no-artwork.png"), "rb") as f:
@@ -172,15 +171,14 @@ def artwork(request):
 def artwork_find(request,albumName):
 	if request.method == "GET":
 		with mpdConnection() as client:
-			html_parser = HTMLParser.HTMLParser()
 			result = client.search('album',albumName)
 			file = mutagen.File(os.environ['HOME']+"/Music/"+result[0]['file'])
 			if type(file) is mutagen.mp4.MP4:
-				if file.tags.has_key('covr'):
+				if 'covr' in file.tags:
 					return HttpResponse(file.tags['covr'][0],content_type="image/jpeg")
 
 			if type(file) is mutagen.mp3.MP3:
-				if file.tags.has_key('APIC:'):
+				if 'APIC:' in file.tags:
 					return HttpResponse(file.tags['APIC:'].data,content_type=file.tags['APIC:'].mime)
 
 	with open(os.path.join(settings.BASE_DIR, "static/no-artwork.png"), "rb") as f:

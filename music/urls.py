@@ -1,7 +1,9 @@
 from django.conf.urls import url
+from django.urls import path
 
 from music import views
 
+app_name = 'music'
 urlpatterns = [
 	url(r'^$', views.index, name="index"),
 	url(r'^artwork/current$', views.artwork, name='artwork'),
