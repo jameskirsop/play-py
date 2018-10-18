@@ -48,3 +48,22 @@ function sameOrigin(url) {
 //         }
 //     }
 // });
+
+function shortern_string_if_needed(string){
+    strShortend = string.slice(0,35);
+    if (string == strShortend) {
+        return string
+    } else {
+        return strShortend+'...'
+    }
+}
+
+function str_pad_left(string,pad,length) {
+    return (new Array(length+1).join(pad)+string).slice(-length);
+}
+
+function convert_seconds_to_tracktime(clicks){
+    var minutes = Math.floor(clicks / 60);
+    var seconds = clicks - minutes * 60;
+    return str_pad_left(minutes,'0',2)+':'+str_pad_left(seconds,'0',2);
+}
