@@ -107,9 +107,9 @@
 
 	var albumTemplate = _.template('<span class="album-title"><%= title %></span><br /><img src="/artwork/album/<%= encodeURIComponent(title) %>" class="album-artwork"><ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><%= track.title %> <i class="fa fa-plus"></i></a></li><% }); %></ol>');
 
-	var albumTemplate_2 = _.template('<div><img src="/artwork/album/<%= encodeURIComponent(title) %>"></div><div><span class="title"><%= title %></span><br /><span class="artist"><%= artist %></span><ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><span class="track_info"><%= shortern_string_if_needed(track.title) %></span><span class="time_add"><%= convert_seconds_to_tracktime(track.time) %>  &nbsp;<i class="fa fa-plus"></i></span></a></li><% }); %></ol></div>')
+	var albumTemplate_2 = _.template('<div><img src="/artwork/<%= encodeURIComponent(artist) %>/album/<%= encodeURIComponent(title) %>"></div><div><div class="album_head_row"><div class="album_info"><span class="title"><%= title %></span><br /><span class="artist"><%= artist %></span></div></div><ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><span class="track_info"><%= shortern_string_if_needed(track.title) %></span><span class="time_add"><%= convert_seconds_to_tracktime(track.time) %>  &nbsp;<i class="fa fa-plus"></i></span></a></li><% }); %></ol></div>')
 
-	var artworkTemplate = _.template('<a href="#" class="grabAlbum" data-artist="<%= artist %>" data-album="<%= album %>"><div class="browse_artwork_container"><img src="/artwork/album/<%= encodeURIComponent(album) %>"></div><div class="browse_artwork_info"><%= album %></div><div class="browse_artwork_info artist_name"><%= artist %></div></a>')
+	var artworkTemplate = _.template('<a href="#" class="grabAlbum" data-artist="<%= artist %>" data-album="<%= album %>"><div class="browse_artwork_container"><img src="/artwork/<%= encodeURIComponent(artist) %><% if(artist != ""){ %>/<% } %>album/<%= encodeURIComponent(album) %>"></div><div class="browse_artwork_info"><%= album %></div><div class="browse_artwork_info artist_name"><%= artist %></div></a><div class="triangle"></div>')
 	var active = undefined;
 
 	function assignTrackAddLinks(el){
@@ -235,7 +235,7 @@
 
 
 	function loadAlbumArt(){
-		xhrAlbumRequest.open("GET","/list/albums/"+iAlbumStart+"/"+parseInt(iAlbumStart+19));
+		xhrAlbumRequest.open("GET","/list/albums/"+iAlbumStart+"/"+parseInt(iAlbumStart+20));
 		xhrAlbumRequest.onload = function(e){
 			if (xhrAlbumRequest.status >= 200 && xhrAlbumRequest.status < 400) {
 				var resultsList = document.querySelector('#browsing_album > ol');
@@ -273,11 +273,15 @@
 						
 						if (resultsList.querySelector('.selected')) {
 							resultsList.querySelector('.selected').classList.remove('selected');
+							document.getElementById('album_track_list').classList.add('less_hidden');
+							document.getElementById('album_track_list').classList.add('hide');
+
+						} else {
+							if (this.classList)
+								this.classList.add('selected')
+							else
+								this.className += ' ' + 'selected'
 						}
-						if (this.classList)
-							this.classList.add('selected')
-						else
-							this.className += ' ' + 'selected'
 
 						var itemsPerRow = 0;
 						var topRowPos = document.getElementById('browsing_album').querySelector('li:not(#album_track_list):not(#album_track_list li)').offsetTop;

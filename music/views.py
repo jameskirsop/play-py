@@ -54,11 +54,9 @@ def list(request, queryString,start,end):
 		with mpdConnection() as client:
 			if queryString == 'albums':
 				for artist in client.list('albumartist')[int(start):int(end)]:
+					print(artist)
 					for album in client.list('album','artist',artist):
-						# print album
-						# print '=='+artist
 						lReturn.append({'artist':artist,'album':album})
-					# pass
 			return HttpResponse(
 				json.dumps(lReturn),
 				content_type="application/json"
@@ -168,10 +166,13 @@ def artwork(request):
 	with open(os.path.join(settings.BASE_DIR, "static/no-artwork.png"), "rb") as f:
 		return HttpResponse(f.read(), content_type="image/jpeg")
 
-def artwork_find(request,albumName):
+def artwork_find(request,albumName,artistName=None):
 	if request.method == "GET":
 		with mpdConnection() as client:
-			result = client.search('album',albumName)
+			if artistName:
+				result = client.search('album',albumName,'artist',artistName)
+			else:
+				result = client.search('album',albumName)
 			file = mutagen.File(os.environ['HOME']+"/Music/"+result[0]['file'])
 			if type(file) is mutagen.mp4.MP4:
 				if 'covr' in file.tags:
