@@ -41,6 +41,7 @@ while True:
 					'tracks': playlist[1:11],
 					'iTotalTracks': len(playlist) - 1
 					})
+				break
 			except Exception as e:
 				time.sleep(delay)
 				delay *= backoff
