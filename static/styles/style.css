@@ -192,9 +192,28 @@ div.artwork-blur {
   width: 200px;
   min-height: 200px;
 }
+#browsing_album > ol > li div.triangle {
+  display: none;
+  width: 0;
+  height: 0;
+  border-radius: 2px;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 15px solid #FAFAFA;
+  position: relative;
+  transform: translateX(-50%);
+  left: 50%;
+  bottom: -15px;
+}
 #browsing_album > ol > li.selected {
-  border: solid 3px #C3CAF0;
-  border-radius: 3px;
+  border-top: solid 3px #C3CAF0;
+  border-right: solid 3px #C3CAF0;
+  border-left: solid 3px #C3CAF0;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+#browsing_album > ol > li.selected div.triangle {
+  display: block;
 }
 #browsing_album > ol > li div.browse_artwork_container {
   min-height: 200px;
@@ -226,7 +245,7 @@ div.artwork-blur {
   border-bottom-right-radius: 5px;
   margin: 0 10px;
   font-size: 1rem;
-  max-height: 500px;
+  max-height: 1000px;
   width: 100%;
   transition: max-height 4s ease-in;
   overflow: hidden;
@@ -239,22 +258,15 @@ div.artwork-blur {
   transition: max-height 4s ease-in;
   overflow: hidden;
 }
-#album_track_list span.title {
-  font-size: 1.5em;
-  font-weight: bold;
-}
-#album_track_list span.artist {
-  color: #7E7E7E;
-  font-size: 1.3em;
-  font-weight: bold;
-}
 #album_track_list ol {
+  clear: both;
   display: block;
   list-style: none;
   padding: 0;
+  columns: 2;
 }
 #album_track_list ol li {
-  border-bottom: 1px solid #7b85c2;
+  border-top: 1px solid #7b85c2;
   counter-increment: track-list-counter;
   min-height: auto !important;
   padding: initial !important;
@@ -271,18 +283,41 @@ div.artwork-blur {
 #album_track_list span.time_add {
   float: right;
 }
-#album_track_list div:nth-child(1) {
+#album_track_list > div:nth-child(1) {
   margin: 0 10px;
   float: left;
   max-width: 25%;
 }
-#album_track_list div:nth-child(1) img {
+#album_track_list > div:nth-child(1) img {
   border-radius: 5px;
   width: 100%;
 }
-#album_track_list div:nth-child(2) {
+#album_track_list > div:nth-child(2) {
   float: left;
-  min-width: 35%;
+  min-width: 72%;
+}
+#album_track_list > div:nth-child(2) div.album_head_row {
+  overflow: auto;
+  margin-bottom: 8px;
+}
+#album_track_list > div:nth-child(2) div.album_head_row div.album_info {
+  float: left;
+}
+#album_track_list > div:nth-child(2) div.album_head_row div.album_info span.title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+#album_track_list > div:nth-child(2) div.album_head_row div.album_info span.artist {
+  color: #7E7E7E;
+  font-size: 1.3em;
+}
+#album_track_list > div:nth-child(2) div.album_head_row a {
+  color: #fff;
+  display: block;
+  float: right;
+  background-color: #22317f;
+  border-radius: 5px;
+  padding: 5px;
 }
 form.search ul.results {
   -webkit-margin-before: 0;

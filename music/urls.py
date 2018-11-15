@@ -14,5 +14,6 @@ urlpatterns = [
 	url(r'^search/(?P<queryString>.+)$', views.search, name='search'),
 	url(r'^list/(?P<queryString>.+)/(?P<start>\d+)/(?P<end>\d+)$', views.list, name='list'),
 	url(r'^filter/(?P<sType>(artist|album){1})/(?P<queryString>.+)$', views.filter, name='search'),
+	url(r'^add/(?P<artistName>.+)/(?P<albumName>.+)$', views.add, name='add_album'),
 	url(r'^add/$', views.add, name='add')
 ]

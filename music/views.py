@@ -54,7 +54,6 @@ def list(request, queryString,start,end):
 		with mpdConnection() as client:
 			if queryString == 'albums':
 				for artist in client.list('albumartist')[int(start):int(end)]:
-					print(artist)
 					for album in client.list('album','artist',artist):
 						lReturn.append({'artist':artist,'album':album})
 			return HttpResponse(
@@ -116,13 +115,31 @@ def get_album(request, artistName, albumName):
 		content_type="application/json"
 	)
 
-def add(request):
-	# if request.is_ajax() and request.method == "POST":
+def add(request, artistName=None, albumName=None):
 	if request.method == "POST":
 		with mpdConnection() as client:
-			if json.loads(request.body)['uri']:
-				try:
-					client.add(json.loads(request.body)['uri'])
+			try:
+				if json.loads(request.body)['uri']:
+					try:
+						client.add(json.loads(request.body)['uri'])
+						playlist = client.playlistinfo()
+						pusher_client.trigger('play-py', 'upcoming-track-list', {
+							'tracks': playlist[1:11],
+							'iTotalTracks': len(playlist) - 1
+							})
+						client.play()
+						return HttpResponse(
+							json.dumps({"result": "success"}),
+							content_type="application/json"
+						)
+					except Exception:
+						return HttpResponseBadRequest(
+							json.dumps({"result": "failure"}),
+							content_type="application/json"
+						)
+			except json.decoder.JSONDecodeError:
+				if artistName:
+					client.findadd('artist',artistName,'album',albumName)
 					playlist = client.playlistinfo()
 					pusher_client.trigger('play-py', 'upcoming-track-list', {
 						'tracks': playlist[1:11],
@@ -130,13 +147,8 @@ def add(request):
 						})
 					client.play()
 					return HttpResponse(
-						json.dumps({"result": "success"}),
-						content_type="application/json"
-					)
-				except Exception:
-					return HttpResponseBadRequest(
-						json.dumps({"result": "failure"}),
-						content_type="application/json"
+							json.dumps({"result": "success"}),
+							content_type="application/json"
 					)
 	return HttpResponseBadRequest(
 		json.dumps({"result": "failure"}),
