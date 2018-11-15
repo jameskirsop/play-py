@@ -105,7 +105,7 @@ def get_album(request, artistName, albumName):
 	html_parser = html.parser.HTMLParser()
 	dResult = []
 	with mpdConnection() as client:
-		results = client.find('artist',html_parser.unescape(urllib.parse.unquote(artistName)))
+		results = client.find('albumartist',html_parser.unescape(urllib.parse.unquote(artistName)))
 		for result in results:
 			if 'album' in result and result['album'] == albumName:
 				dResult.append(result)
