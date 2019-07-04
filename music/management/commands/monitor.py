@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from mpd import MPDClient
 from music.models import Artist,Song
 import time
+from requests.exceptions import ConnectionError
 
 import pusher
 pusher_client = pusher.Pusher(
@@ -25,12 +26,22 @@ while True:
 	nextsong.now_playing()
 	if cursong != nextsong:
 		cursong = nextsong
-		pusher_client.trigger('play-py', 'now-playing', {
-			'artist': cursong.artist if hasattr(cursong,'artist') else '',
-			'title': cursong.title if hasattr(cursong,'title') else '',
-			'album': cursong.album if hasattr(cursong,'album') else '',
-			'file': cursong.file if hasattr(cursong,'file') else ''
-			})
+		backoff = 2
+		delay = 2
+		while True:
+			try:
+				pusher_client.trigger('play-py', 'now-playing', {
+					'artist': cursong.artist if hasattr(cursong,'artist') else '',
+					'title': cursong.title if hasattr(cursong,'title') else '',
+					'album': cursong.album if hasattr(cursong,'album') else '',
+					'file': cursong.file if hasattr(cursong,'file') else ''
+					})
+				break
+			except ConnectionError:
+				time.sleep(delay)
+				if delay < 90:
+					delay *= backoff
+
 		playlist = client.playlistinfo()
 		backoff = 2
 		delay = 2
@@ -49,4 +60,3 @@ while True:
 					continue
 				delay = 2
 				n = 0
-				# raise e		
