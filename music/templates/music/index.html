@@ -39,7 +39,7 @@
 					</div>
 					<div id="browsing_album" style="display:flex;">
 						<ol>
-							<li id="album_track_list" class="hide less_hidden">
+							<li id="album_track_list" class="dom_search_exclude hide less_hidden">
 							</li>
 						</ol>
 					</div>
@@ -107,7 +107,7 @@
 
 	var albumTemplate = _.template('<span class="album-title"><%= title %></span><br /><img src="/artwork/album/<%= encodeURIComponent(title) %>" class="album-artwork"><ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><%= track.title %> <i class="fa fa-plus"></i></a></li><% }); %></ol>');
 
-	var albumTemplate_2 = _.template('<div><img src="/artwork/<%= encodeURIComponent(artist) %>/album/<%= encodeURIComponent(title) %>"></div><div><div class="album_head_row"><div class="album_info"><span class="title"><%= title %></span><br /><span class="artist"><%= artist %></span></div><a href="#" class="preventClick" data-uri="/add/<%= encodeURIComponent(artist) %>/<%= encodeURIComponent(title) %>">Queue Album <i class="fa fa-plus"></i></a></div><ol><% _.each(tracks,function(track){ %><li><a href="#" data-uri="<%= track.file %>"><span class="track_info"><%= shortern_string_if_needed(track.title) %></span><span class="time_add"><%= convert_seconds_to_tracktime(track.time) %>  &nbsp;<i class="fa fa-plus"></i></span></a></li><% }); %></ol></div>')
+	var albumTemplate_2 = _.template('<div><img src="/artwork/<%= encodeURIComponent(artist) %>/album/<%= encodeURIComponent(title) %>"></div><div><div class="album_head_row"><div class="album_info"><span class="title"><%= title %></span><br /><span class="artist"><%= artist %></span></div><a href="#" class="preventClick" data-uri="/add/<%= encodeURIComponent(artist) %>/<%= encodeURIComponent(title) %>">Queue Album <i class="fa fa-plus"></i></a></div><ol><% _.each(tracks,function(track){ %><li class="dom_search_exclude"><a href="#" data-uri="<%= track.file %>"><span class="track_info"><%= shortern_string_if_needed(track.title) %></span><span class="time_add"><%= convert_seconds_to_tracktime(track.time) %>  &nbsp;<i class="fa fa-plus"></i></span></a></li><% }); %></ol></div>')
 
 	var artworkTemplate = _.template('<a href="#" class="grabAlbum" data-artist="<%= artist %>" data-album="<%= album %>"><div class="browse_artwork_container"><img src="/artwork/<%= encodeURIComponent(artist) %><% if(artist != ""){ %>/<% } %>album/<%= encodeURIComponent(album) %>"></div><div class="browse_artwork_info"><%= album %></div><div class="browse_artwork_info artist_name"><%= artist %></div></a><div class="triangle"></div>')
 	var active = undefined;
@@ -242,7 +242,7 @@
 				_.each(JSON.parse(xhrAlbumRequest.responseText),function(album){
 					liEl = document.createElement('li');
 			    	liEl.innerHTML = artworkTemplate(album)
-			    	link = liEl.querySelector('a.grabAlbum');
+					link = liEl.querySelector('a.grabAlbum');
 			    	liEl.addEventListener('click',function(event){
 						selected = resultsList.querySelector('.selected')
 						if (selected) {
@@ -263,9 +263,9 @@
 									this.className += ' ' + 'selected'
 						}
 						var itemsPerRow = 0;
-						var topRowPos = document.getElementById('browsing_album').querySelector('li:not(#album_track_list):not(#album_track_list li)').offsetTop;
+						var topRowPos = document.getElementById('browsing_album').querySelector('li:not(.dom_search_exclude)').offsetTop;
 						var i = 0;
-						for (let el of document.getElementById('browsing_album').querySelectorAll('li:not(#album_track_list):not(#album_track_list li)')){
+						for (let el of document.getElementById('browsing_album').querySelectorAll('li:not(.dom_search_exclude)')){
 							if(el.offsetTop != topRowPos){
 								itemsPerRow = i;
 								break;
@@ -273,12 +273,13 @@
 							i++;
 						}
 
-						selectedIndex = Array.prototype.indexOf.call(resultsList.querySelectorAll('li:not(#album_track_list):not(#album_track_list li)'),resultsList.querySelector('.selected'));
+						selectedIndex = Array.prototype.indexOf.call(resultsList.querySelectorAll('li:not(.dom_search_exclude)'),resultsList.querySelector('.selected'));
 						selectedRowNum = Math.floor(selectedIndex / itemsPerRow) + 1;
-						
+						var hiding = false
 						if (selectedRowNum != lastSelectedRowNum)
 							document.getElementById('album_track_list').classList.add('less_hidden');
-							document.getElementById('album_track_list').classList.add('hide');	
+							document.getElementById('album_track_list').classList.add('hide');
+							hiding = true
 
 						var lastSelectedRowNum = selectedRowNum
 						
@@ -300,10 +301,14 @@
 								});
 						
 								_.each(document.getElementById('album_track_list').querySelectorAll('li'), function(el){assignTrackAddLinks(el);});			
-								
-								resultsList.querySelectorAll('li:not(#album_track_list):not(#album_track_list li)').item((selectedRowNum * itemsPerRow) - 1).insertAdjacentElement('afterend',document.getElementById('album_track_list'));
-								document.getElementById('album_track_list').classList.remove('hide');
-								document.getElementById('album_track_list').classList.remove('less_hidden')
+
+								if(((selectedRowNum * itemsPerRow) - 1) < 0){
+									resultsList.querySelectorAll('li:not(.dom_search_exclude)').item(0).insertAdjacentElement('beforebegin',document.getElementById('album_track_list'));
+								} else {
+									resultsList.querySelectorAll('li:not(.dom_search_exclude)').item((selectedRowNum * itemsPerRow) - 1).insertAdjacentElement('afterend',document.getElementById('album_track_list'));
+									document.getElementById('album_track_list').classList.remove('hide');
+									document.getElementById('album_track_list').classList.remove('less_hidden')
+								}
 
 							}
 						};

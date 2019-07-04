@@ -186,6 +186,10 @@ div.artwork-blur {
 #browsing_album > ol > li {
   font-size: 0.8em;
   padding: 15px 5px;
+  min-width: 0;
+  overflow: hidden;
+  display: block;
+  flex: 1 1 auto;
   text-align: left;
 }
 #browsing_album > ol > li:not(#album_track_list):not(#album_track_list li) {
@@ -217,20 +221,25 @@ div.artwork-blur {
 }
 #browsing_album > ol > li div.browse_artwork_container {
   min-height: 200px;
-  width: 100%;
+  min-width: 0;
   margin: 0px auto;
+  flex: 1;
 }
 #browsing_album > ol > li div.browse_artwork_container img {
   margin: 0;
-  width: 100%;
+  min-height: 0;
+  min-width: 0;
+  max-height: 20vh;
+  max-width: 100%;
   border: solid 1px #C2C2C2;
   border-radius: 5px;
+  object-fit: scale-down;
 }
 #browsing_album > ol > li div.browse_artwork_info {
   clear: both;
   display: block;
   margin: 0.1em 0;
-  width: 100%;
+  max-width: 20vh;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
