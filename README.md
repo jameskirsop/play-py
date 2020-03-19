@@ -13,7 +13,10 @@ PlayPy is written off the back of [mpd](https://github.com/MusicPlayerDaemon/) a
 There's also a full screen web view to show a Now Playing display on a TV or other monitor. This is available at http://yourweburl:port/screen. We have PlayPy running on a 27" iMac in the office and this view is what is on the screen, so staff know what song is playing.
 
 ## Requirements and Setup
-
-You'll need a Pusher.js account (a basic account is free), and an API key for the service. You'll need to place your key into the appropriate location in static/js/pusher.js
+First create a virtualenv and copy/clone this project into it.
 
 Inside your virtualenv you'll want to use pip to install the packages in requirements.txt
+
+Inside the `script` directory, there are two plist files for you to use to control the `monitor` and `queue` management command processes and a third to spin up the wsgi process. You can place these in the [appropriate directories of your choosing](https://medium.com/swlh/how-to-use-launchd-to-run-services-in-macos-b972ed1e352). You will also need to adjust the paths to your virtualenv in each of the `.plist` files.
+
+You will also need a Pusher.js account (a basic account is free), and an API key for the service. You'll need to place your key into the appropriate location in static/js/pusher.js

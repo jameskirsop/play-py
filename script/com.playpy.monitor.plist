@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>playpy.queue</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/yodelbox/play-py/venv/bin/python</string>
+        <string>/Users/yodelbox/play-py/manage.py</string>
+        <string>queue</string>
+    </array>
+    <key>StandardErrorPath</key>
+    <string>/var/log/playpy/queue.log</string>
+    <key>KeepAlive</key>
+    <true/>
+</dict>
+</plist>

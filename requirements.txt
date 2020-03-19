@@ -1,8 +1,7 @@
 cffi==1.11.5
 cryptography
-Django==2.1.2
+Django==2.2
 django-cors-headers==2.4.0
-idna==2.1
 ipaddress==1.0.16
 mutagen==1.41
 ndg-httpsclient==0.5.1
