@@ -2,7 +2,7 @@
 
 After the author (@holman) declared that [Play](https://github.com/play/play) wasn't under active development, I took it upon myself to rewrite the project (to some extent) in Python, on top of Django. PlayPy is the result.
 
-<img src="https://user-images.githubusercontent.com/1734219/92557192-ff51be80-f2ae-11ea-8100-c68d4107d42b.png" width=50% height=50%>
+<img src="https://user-images.githubusercontent.com/1734219/92557657-0c22e200-f2b0-11ea-9855-e9f0708638d4.png">
 
 ## What it does
 
