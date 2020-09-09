@@ -4,11 +4,11 @@
 
 case $1 in
 	start)
-		mpd config/mpd.conf > /dev/null 2>&1
-		exit 0
+		/usr/local/bin/mpd config/mpd.conf
+		exit $?
 		;;
 	stop)
-		mpd config/mpd.conf --kill > /dev/null 2>&1
-		exit 0
+		/usr/local/bin/mpd config/mpd.conf --kill
+		exit $?
 		;;
 esac
